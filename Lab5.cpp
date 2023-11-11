@@ -12,133 +12,88 @@ asking for another game.*/
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include "Messages.h"
 
 class NumberGuessingGame {
+public:
+    // Constructor to initialize game state
+    NumberGuessingGame() : wins(0), losses(0) {
+        srand(static_cast<unsigned int>(time(0))); // Seed for random number generation
+    }
+
+    // Function to play the game
+    void playGame() {
+        int targetNumber = rand() % 101; // Generate a random number between 0 and 100
+        int guess;
+        int attempts = 0;
+        bool hasWon = false;
+
+        // Main game loop
+        do {
+            std::cout << "Enter your guess (0-100): ";
+            std::cin >> guess;
+
+            // Check for invalid input
+            if (std::cin.fail()) {
+                std::cin.clear();
+                std::cin.ignore(INT_MAX, '\n');
+                std::cout << "Invalid input. Please enter a number.\n";
+                continue;
+            }
+
+            attempts++;
+
+            // Check if the guess is correct
+            if (guess == targetNumber) {
+                hasWon = true;
+                break;
+            }
+            else if (guess < targetNumber) {
+                std::cout << "Too low! Try again.\n";
+            }
+            else {
+                std::cout << "Too high! Try again.\n";
+            }
+
+        } while (attempts < 20);
+
+        // Display appropriate message based on the result
+        if (hasWon) {
+            std::cout << Messages::getRandomWinMessage() << "\n";
+            wins++;
+        }
+        else {
+            std::cout << Messages::getRandomLoseMessage() << "\n";
+            losses++;
+        }
+    }
+
+    // Function to start the game loop
+    void startGame() {
+        char playAgain;
+
+        // Outer loop for restarting the game
+        do {
+            playGame();
+
+            std::cout << Messages::getRandomAskMessage() << " (y/n): ";
+            std::cin >> playAgain;
+
+        } while (playAgain == 'y' || playAgain == 'Y');
+
+        // Display total wins and losses when the user quits
+        std::cout << "Total Wins: " << wins << "\n";
+        std::cout << "Total Losses: " << losses << "\n";
+    }
+
 private:
     int wins;
     int losses;
-
-    // Function to display a random winning message
-    void displayWinMessage() {
-        srand(time(0)); // Seed for random number generation
-        std::string winMessages[] = {
-            "Congratulations! You guessed it right!",
-            "You're a mastermind! You won this round!",
-            "Victory is yours! Well done!",
-            "Fantastic! You cracked the code!",
-            "Bravo! You're the number-guessing champion!",
-            "Incredible! You've mastered the guessing game!",
-            "Awesome! Your intuition is spot on!",
-            "Hooray! Another triumph for your guessing skills!",
-            "You're unstoppable! Another win in the bag!",
-            "Outstanding! Your guessing prowess is unmatched!"
-        };
-
-        int randomIndex = rand() % 10;
-        std::cout << winMessages[randomIndex] << std::endl;
-    }
-
-    // Function to display a random losing message
-    void displayLoseMessage() {
-        srand(time(0)); // Seed for random number generation
-        std::string loseMessages[] = {
-            "Oops! You ran out of attempts. Better luck next time!",
-            "Not this time, but don't give up!",
-            "You didn't quite get it, but practice makes perfect!",
-            "No worries, it happens! Try again!",
-            "Better luck next round! You're getting closer!",
-            "Don't be discouraged! The next guess might be the one!",
-            "Missed it this time, but your persistence is commendable!",
-            "It's okay! Every attempt is a step toward improvement.",
-            "No victory this time, but the challenge continues!",
-            "Learning from setbacks is the key to eventual success!"
-        };
-
-        int randomIndex = rand() % 10;
-        std::cout << loseMessages[randomIndex] << std::endl;
-    }
-
-    // Function to display a random play again message
-    void displayPlayAgainMessage() {
-        srand(time(0)); // Seed for random number generation
-        std::string playAgainMessages[] = {
-            "Want to play again? (yes/no): ",
-            "Ready for another round? (yes/no): ",
-            "Feel like trying again? (yes/no): ",
-            "Up for another challenge? (yes/no): ",
-            "Ready to test your luck again? (yes/no): ",
-            "Eager for another game? (yes/no): ",
-            "Curious for more challenges? (yes/no): ",
-            "Excited for another round? (yes/no): ",
-            "Fancy another attempt? (yes/no): ",
-            "Up for the challenge once more? (yes/no): "
-        };
-
-        int randomIndex = rand() % 10;
-        std::cout << playAgainMessages[randomIndex];
-    }
-
-public:
-    // Constructor to initialize wins and losses
-    NumberGuessingGame() : wins(0), losses(0) {}
-
-    // Function to play the number-guessing game
-    void playGame() {
-        do {
-            int secretNumber = rand() % 101; // Random number between 0 and 100
-            int attempts = 20;
-            bool won = false;
-
-            while (attempts > 0) {
-                int guess;
-                std::cout << "Guess the number (0-100). You have " << attempts << " attempts left: ";
-                std::cin >> guess;
-
-                if (guess == secretNumber) {
-                    won = true;
-                    break;
-                }
-                else if (guess < secretNumber) {
-                    std::cout << "Too low! Try again." << std::endl;
-                }
-                else {
-                    std::cout << "Too high! Try again." << std::endl;
-                }
-
-                attempts--;
-            }
-
-            if (won) {
-                wins++;
-                displayWinMessage();
-            }
-            else {
-                losses++;
-                displayLoseMessage();
-            }
-
-            displayPlayAgainMessage();
-
-            std::string playAgain;
-            do {
-                std::cout << "Play again? (yes/no): ";
-                std::cin >> playAgain;
-            } while (playAgain != "yes" && playAgain != "no");
-
-            if (playAgain == "no") {
-                break;
-            }
-
-        } while (true);
-
-        std::cout << "\nTotal Wins: " << wins << "\nTotal Losses: " << losses << std::endl;
-    }
 };
 
 int main() {
     NumberGuessingGame game;
-    game.playGame();
+    game.startGame();
 
     return 0;
 }
-
